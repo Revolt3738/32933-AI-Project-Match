@@ -4,6 +4,10 @@
 
 ![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)
 ![Flask Version](https://img.shields.io/badge/flask-2.0+-green.svg)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-1.4+-orange.svg)
+![SQLite](https://img.shields.io/badge/SQLite-3-blue.svg)
+![Jinja2](https://img.shields.io/badge/Jinja2-brightgreen.svg)
+![DeepSeek API](https://img.shields.io/badge/AI-DeepSeek%20API-9cf.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 </div>
@@ -88,9 +92,7 @@ AI Project Match 是一个基于 AI 的智能项目匹配平台，帮助学生�
 
 6.  **访问应用**
 
-    在浏览器中打开 http://localhost:5000 (或 Flask 输出的其他地址)。
-
-
+    在浏览器中打开 http://localhost:5000 (或 Flask 输出的其他地址) 开始使用！
 
 ## 🔧 系统架构
 
