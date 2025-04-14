@@ -18,21 +18,6 @@ AI Project Match 是一个基于 AI 的智能项目匹配平台，帮助学生�
 - 🎯 **精准推荐**: 基于多维度分析的项目匹配算法
 - 🔄 **实时反馈**: 即时的项目选择和取消功能
 
-## 🖥 界面预览
-
-<div align="center">
-<table>
-<tr>
-<td>学生聊天界面</td>
-<td>教师项目管理</td>
-</tr>
-<tr>
-<td><img src="docs/images/student-chat.png" alt="学生聊天界面"></td>
-<td><img src="docs/images/teacher-dashboard.png" alt="教师仪表板"></td>
-</tr>
-</table>
-</div>
-
 ## 🚀 快速开始
 
 ### 环境要求
