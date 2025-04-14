@@ -90,7 +90,7 @@ AI Project Match 是一个基于 AI 的智能项目匹配平台，帮助学生�
 
     在浏览器中打开 http://localhost:5000 (或 Flask 输出的其他地址)。
 
-访问 http://localhost:5000 开始使用！
+
 
 ## 🔧 系统架构
 
