@@ -94,15 +94,11 @@ flowchart TD
 
 详细的 API 文档请参见 [API.md](docs/API.md)
 
-## 🤝 贡献指南
-
-欢迎贡献代码！请查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解如何参与项目开发。
-
 ## 📄 开源协议
 
 本项目采用 MIT 协议开源，详见 [LICENSE](LICENSE) 文件。
 
-## 🙋‍♂️ 测试账号
+## 🔑 演示账号
 
 - 教师账号：demo_teacher@test.com / test123
 - 学生账号：demo_student@test.com / test123
