@@ -110,10 +110,3 @@ flowchart TD
 ## 🔗 相关链接
 
 - [项目文档](https://github.com/Revolt3738/32933-AI-Project-Match/tree/main/docs)
-- [更新日志](https://github.com/Revolt3738/32933-AI-Project-Match/blob/main/CHANGELOG.md)
-- [问题反馈](https://github.com/Revolt3738/32933-AI-Project-Match/issues)
-
----
-<div align="center">
-Made with ❤️ for UTS
-</div>
