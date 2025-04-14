@@ -106,7 +106,3 @@ flowchart TD
 
 - 教师账号：demo_teacher@test.com / test123
 - 学生账号：demo_student@test.com / test123
-
-## 🔗 相关链接
-
-- [项目文档](https://github.com/Revolt3738/32933-AI-Project-Match/tree/main/docs)
