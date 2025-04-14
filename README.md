@@ -22,39 +22,73 @@ AI Project Match 是一个基于 AI 的智能项目匹配平台，帮助学生�
 
 ### 环境要求
 
+- Git
 - Python 3.8+
-- Flask 2.0+
-- SQLite3
+- pip (Python 包管理器)
+- SQLite3 (通常随 Python 一起安装)
 - 现代浏览器（推荐 Chrome）
 
 ### 安装步骤
 
-1. 克隆仓库
-```bash
-git clone https://github.com/Revolt3738/32933-AI-Project-Match.git
-cd 32933-AI-Project-Match
-```
+1.  **克隆仓库**
 
-2. 安装依赖
-```bash
-pip install -r requirements.txt
-```
+    ```bash
+    git clone https://github.com/Revolt3738/32933-AI-Project-Match.git
+    cd 32933-AI-Project-Match
+    ```
 
-3. 配置环境变量
-```bash
-cp .env.example .env
-# 编辑 .env 文件，填入必要的配置信息
-```
+2.  **创建并激活虚拟环境** (推荐)
 
-4. 初始化数据库
-```bash
-python app.py
-```
+    *   **Windows (PowerShell):**
+        ```powershell
+        python -m venv venv
+        .\venv\Scripts\Activate.ps1
+        # 如果遇到脚本执行策略问题，可能需要先运行: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+        ```
+    *   **Linux / macOS (bash):**
+        ```bash
+        python3 -m venv venv
+        source venv/bin/activate
+        ```
+    *   *激活后，终端提示符前应出现 `(venv)`。*
 
-5. 运行应用
-```bash
-flask run
-```
+3.  **安装依赖**
+
+    *   在激活的虚拟环境中运行：
+        ```bash
+        pip install -r requirements.txt
+        ```
+
+4.  **配置环境变量**
+
+    *   复制示例文件：
+        ```bash
+        # Windows (cmd/powershell)
+        copy .env.example .env
+        # Linux / macOS
+        cp .env.example .env
+        ```
+    *   **编辑 `.env` 文件**，至少填入你的 `DEEPSEEK_API_KEY`：
+        ```dotenv
+        SECRET_KEY='一个随机且安全的字符串'  # 可选，不填会使用默认值
+        DATABASE_URL='sqlite:///instance/test.db' # 可选，默认使用 SQLite
+        DEEPSEEK_API_KEY='你的DeepSeek API密钥' # 必需
+        ```
+
+5.  **初始化数据库并运行应用**
+
+    *   运行 `app.py` 会自动检查并创建数据库（如果不存在），然后启动开发服务器：
+        ```bash
+        python app.py
+        ```
+    *   或者，如果只想运行应用而不依赖 `app.py` 中的初始化逻辑（假设数据库已存在或通过其他方式创建）：
+        ```bash
+        flask run
+        ```
+
+6.  **访问应用**
+
+    在浏览器中打开 http://localhost:5000 (或 Flask 输出的其他地址)。
 
 访问 http://localhost:5000 开始使用！
 
