@@ -113,12 +113,7 @@ flowchart TD
 - [更新日志](https://github.com/Revolt3738/32933-AI-Project-Match/blob/main/CHANGELOG.md)
 - [问题反馈](https://github.com/Revolt3738/32933-AI-Project-Match/issues)
 
-## 👥 作者
-
-- 开发团队
-- 联系方式：your-email@example.com
-
 ---
 <div align="center">
-Made with ❤️ by Your Team
+Made with ❤️ for UTS
 </div>
