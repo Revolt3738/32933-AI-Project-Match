@@ -1,0 +1,8 @@
+Flask==2.2.5
+Flask-Login==0.6.2
+Flask-SQLAlchemy==2.5.1
+requests==2.31.0
+python-dotenv==0.19.0
+Werkzeug==2.2.3
+SQLAlchemy==1.4.41
+openai==0.28.0
