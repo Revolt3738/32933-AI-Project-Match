@@ -136,5 +136,5 @@ flowchart TD
 
 ## 🔑 演示账号
 
-- 教师账号：demo_teacher@test.com / test123
-- 学生账号：demo_student@test.com / test123
+- 教师账号：teacher@test.com / test123
+- 学生账号：student@test.com / test123
