@@ -23,6 +23,9 @@
                             <h3 class="text-lg font-medium text-gray-900">{{ project.name }}</h3>
                             <p class="mt-1 text-sm text-gray-600">{{ project.description }}</p>
                             <p class="mt-2 text-sm text-gray-500">Field: {{ project.field }}</p>
+                            {% if project.skill_requirements %}
+                            <p class="mt-2 text-sm text-gray-500">Skills: {{ project.skill_requirements }}</p>
+                            {% endif %}
                             
                             <!-- Interested Students List -->
                             {% if project.interested_students %}
@@ -75,33 +78,41 @@ function closeNewProjectModal() {
     document.getElementById('newProjectModal').classList.add('hidden');
 }
 
-document.getElementById('newProjectForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const data = {
-        name: formData.get('name'),
-        description: formData.get('description'),
-        field: formData.get('field')
-    };
+// Check if the form element exists before adding event listener
+const newProjectForm = document.getElementById('newProjectForm');
+if (newProjectForm) {
+    newProjectForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = {
+            name: formData.get('name'),
+            description: formData.get('description'),
+            field: formData.get('field'),
+            skill_requirements: formData.get('skill_requirements') // Add skill_requirements from modal form
+        };
 
-    try {
-        const response = await fetch('/api/projects', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        });
+        try {
+            const response = await fetch('/api/projects', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
 
-        if (response.ok) {
-            window.location.reload();
-        } else {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const errorData = await response.json();
+                alert('Failed to create project: ' + (errorData.error || 'Please try again.'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
             alert('Failed to create project, please try again.');
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to create project, please try again.');
-    }
-});
+    });
+} else {
+    // console.warn("Element with ID 'newProjectForm' not found. Modal functionality might be affected on pages other than teacher_dashboard.");
+}
 </script>
 {% endblock %}
