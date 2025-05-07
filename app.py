@@ -57,23 +57,19 @@ def analyze_user_requirements(user_input):
     """分析用户需求，提取关键字和领域"""
     print(f"\n开始分析用户需求: {user_input}")
     
-    # 如果用户只是询问有哪些项目，返回空要求
-    if any(keyword in user_input for keyword in ['有什么项目', '有哪些项目', '所有项目', '查看项目']):
-        print("用户在询问所有项目，返回 None")
-        return None
-        
     messages = [
         {
             "role": "system",
             "content": """#### 定位
 - 智能助手名称：项目需求分析专家
-- 主要任务：分析学生的项目需求，提取关键信息并匹配到预定义的项目领域
+- 主要任务：分析学生的项目需求，提取关键信息（包括领域、技术关键词、项目特点和所需技能）并匹配到预定义的项目领域
 
 #### 能力
 - 需求分析：能够准确理解学生表达的项目兴趣和需求
 - 领域匹配：将需求精确匹配到预定义的项目领域
 - 关键词提取：识别需求中的技术关键词
 - 特点总结：提取用户明确表达的项目特点要求
+- 技能识别：从用户描述中识别出他们拥有或希望使用的编程语言、框架、工具等技能
 
 #### 知识储备
 - 项目领域：
@@ -84,19 +80,22 @@ def analyze_user_requirements(user_input):
   - 大数据
   - 云计算
   - 网络安全
+- 常见技能示例 (不限于此列表): Python, JavaScript, Java, C++, SQL, React, Angular, Vue, Node.js, Django, Flask, Spring, Machine Learning, Deep Learning, Data Analysis, AWS, Azure, Docker, Kubernetes, Git
 
 #### 输出格式
 必须输出合法的 JSON 格式：
 {
     "fields": ["领域1"],  // 数组，1-2个最相关的领域
     "keywords": ["关键词1", "关键词2"],  // 数组，最多3个关键词
-    "features": ["特点1"]  // 数组，用户明确提到的特点要求
+    "features": ["特点1"],  // 数组，用户明确提到的特点要求
+    "skills": ["技能1", "技能2"] // 数组，用户提到或暗示的技能，如果未提及则为空数组 []
 }
 
 #### 匹配规则
 1. 领域：必须从预定义领域中选择
 2. 关键词：优先技术相关词汇
-3. 特点：只提取用户明确表达的要求"""
+3. 特点：只提取用户明确表达的要求
+4. 技能：识别用户直接提及的编程语言、软件、工具等技能，或从项目描述中合理推断的技能。如果用户说"我会编程"，可以尝试识别是否有更具体的编程语言被提及。"""
         },
         {
             "role": "user",
@@ -113,6 +112,15 @@ def analyze_user_requirements(user_input):
     try:
         result = json.loads(response)
         print(f"需求分析结果: {json.dumps(result, ensure_ascii=False, indent=2)}")
+        
+        # Check if result is empty AND user input seems generic
+        is_result_empty = not (result.get('fields') or result.get('keywords') or result.get('features') or result.get('skills'))
+        is_input_generic = any(keyword in user_input for keyword in ['有什么项目', '有哪些项目', '所有项目', '查看项目', '项目推荐'])
+        
+        if is_result_empty and is_input_generic:
+            print("AI未能提取具体需求，且用户输入像是通用查询，返回 None")
+            return None
+            
         return result
     except Exception as e:
         print(f"需求分析失败: {str(e)}")
@@ -122,12 +130,14 @@ def analyze_user_requirements(user_input):
 def rank_projects(requirements, projects):
     """根据用户需求对项目进行排序"""
     print(f"\n开始项目排序...")
-    print(f"用户需求: {json.dumps(requirements, ensure_ascii=False)}")
-    print(f"可用项目: {[{'id': p.id, 'name': p.name, 'field': p.field} for p in projects]}")
+    # Ensure requirements is a dict, even if some keys are missing
+    req_data = requirements if isinstance(requirements, dict) else {}
+    print(f"用户需求: {json.dumps(req_data, ensure_ascii=False)}")
+    print(f"可用项目: {[{'id': p.id, 'name': p.name, 'field': p.field, 'skills': p.skill_requirements} for p in projects]}")
     
-    # 如果没有要求，返回所有项目
-    if not requirements:
-        print("没有具体需求，返回所有项目")
+    # 如果没有要求 (或者没有 fields, keywords, skills 都为空), 返回所有项目
+    if not req_data or (not req_data.get('fields') and not req_data.get('keywords') and not req_data.get('skills')):
+        print("没有具体需求 (领域, 关键词, 技能均为空)，返回所有项目")
         return projects
     
     messages = [
@@ -135,21 +145,21 @@ def rank_projects(requirements, projects):
             "role": "system",
             "content": """#### 定位
 - 智能助手名称：项目匹配专家
-- 主要任务：根据学生需求对项目进行评分和排序
+- 主要任务：根据学生需求（包括领域、关键词、特点和技能）对项目进行评分和排序
 
 #### 能力
-- 需求理解：理解学生的领域兴趣和具体需求
-- 项目分析：分析项目描述和特点
+- 需求理解：理解学生的领域兴趣、技术关键词、项目特点和技能偏好
+- 项目分析：分析项目描述、特点和技能要求
 - 相关度评分：计算项目与需求的匹配程度
 
 #### 评分规则
-总分10分，由以下三部分组成：
-1. 领域匹配（0-5分）：
-   - 完全匹配：5分（需求和项目领域完全一致）
-   - 相关领域：3分（领域紧密相关）
+总分10分，由以下四部分组成：
+1. 领域匹配（0-4分）：
+   - 完全匹配：4分
+   - 相关领域：2分
    - 无关：0分
 
-2. 关键词匹配（0-3分）：
+2. 关键词匹配（0-2分）：
    - 每个关键词完全匹配：1分
    - 每个关键词相关词匹配：0.5分
 
@@ -158,22 +168,31 @@ def rank_projects(requirements, projects):
    - 部分满足：1分
    - 不满足：0分
 
+4. 技能匹配（0-2分）：
+   - 项目所需技能与学生技能高度重合：2分
+   - 部分重合或相关：1分
+   - 完全不符或学生无相关技能：0分
+
 #### 输出格式
 必须输出合法的 JSON 格式：
 {
     "ranked_projects": [
         {
             "id": 项目ID,
-            "score": 分数,
-            "reasoning": "得分理由"
+            "score": 分数, // 0-10分
+            "reasoning": "得分理由，简要说明各部分得分情况"
         }
     ]
-}"""
+}
+
+#### 注意事项
+- 如果学生未提供技能，则技能匹配部分得0分。
+- 如果项目未列出技能要求，则技能匹配部分也视为0分，除非学生技能与项目描述中的技术高度相关。"""
         },
         {
             "role": "user",
-            "content": f"""学生需求：{json.dumps(requirements, ensure_ascii=False)}
-项目列表：{json.dumps([{'id': p.id, 'name': p.name, 'description': p.description, 'field': p.field} for p in projects], ensure_ascii=False)}"""
+            "content": f"""学生需求：{json.dumps(req_data, ensure_ascii=False)}
+项目列表：{json.dumps([{'id': p.id, 'name': p.name, 'description': p.description, 'field': p.field, 'skill_requirements': p.skill_requirements or ''} for p in projects], ensure_ascii=False)}"""
         }
     ]
     
@@ -186,8 +205,8 @@ def rank_projects(requirements, projects):
     try:
         result = json.loads(response)
         print(f"项目匹配结果: {json.dumps(result, ensure_ascii=False, indent=2)}")
-        # 只返回匹配度大于等于3分的项目（降低匹配门槛）
-        ranked_ids = [item['id'] for item in result['ranked_projects'] if item.get('score', 0) >= 3]
+        # 根据新的总分调整阈值，例如匹配度大于等于 3 或 4 分的项目
+        ranked_ids = [item['id'] for item in result['ranked_projects'] if item.get('score', 0) >= 3] # 阈值可调整
         if not ranked_ids:
             print("没有找到匹配度足够高的项目，返回所有项目")
             return projects  # 如果没有匹配项目，返回所有项目
@@ -220,6 +239,7 @@ class Project(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
     field = db.Column(db.String(50), nullable=False)
+    skill_requirements = db.Column(db.Text, nullable=True)  # New field for skill requirements
     teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     interested_students = db.relationship('StudentInterest', backref='project', lazy=True)
 
@@ -338,6 +358,7 @@ def chat():
                 'name': p.name,
                 'description': p.description,
                 'field': p.field,
+                'skill_requirements': p.skill_requirements or '',
                 'teacher_email': User.query.get(p.teacher_id).email
             } for p in ranked_projects]
         })
@@ -374,41 +395,51 @@ def create_project():
         flash('Only teachers can create projects.')
         return redirect(url_for('index'))
 
-    if request.method == 'GET':
-        return render_template('create_project.html')
+    if request.method == 'POST':
+        name = request.form.get('name')
+        description = request.form.get('description')
+        field = request.form.get('field')
+        skill_requirements = request.form.get('skill_requirements', '') # Get skill_requirements
         
-    # POST 请求处理
-    name = request.form.get('name')
-    description = request.form.get('description')
-    field = request.form.get('field')
-    
-    if not all([name, description, field]):
-        flash('All fields are required.')
-        return redirect(url_for('create_project'))
+        if not all([name, description, field]): # Skill requirements can be optional
+            flash('Project Name, Description, and Field are required.') # Updated flash message
+            return redirect(url_for('create_project'))
+            
+        project = Project(
+            name=name,
+            description=description,
+            field=field,
+            skill_requirements=skill_requirements, # Save skill_requirements
+            teacher_id=current_user.id
+        )
+        db.session.add(project)
+        db.session.commit()
         
-    project = Project(
-        name=name,
-        description=description,
-        field=field,
-        teacher_id=current_user.id
-    )
-    db.session.add(project)
-    db.session.commit()
-    
-    flash('Project created successfully!')
-    return redirect(url_for('teacher_dashboard'))
+        flash('Project created successfully!')
+        return redirect(url_for('teacher_dashboard'))
+        
+    return render_template('create_project.html')
 
 @app.route('/api/projects', methods=['POST'])
 @login_required
-def api_create_project():
+def api_create_project(): # This is used by the modal in teacher_dashboard
     if not current_user.is_teacher:
         return jsonify({'error': 'Unauthorized'}), 403
     
     data = request.json
+    name = data.get('name')
+    description = data.get('description')
+    field = data.get('field')
+    skill_requirements = data.get('skill_requirements', '')
+
+    if not all([name, description, field]):
+        return jsonify({'error': 'Project Name, Description, and Field are required.'}), 400
+
     project = Project(
-        name=data['name'],
-        description=data['description'],
-        field=data['field'],
+        name=name,
+        description=description,
+        field=field,
+        skill_requirements=skill_requirements,
         teacher_id=current_user.id
     )
     db.session.add(project)
@@ -418,8 +449,9 @@ def api_create_project():
         'id': project.id,
         'name': project.name,
         'description': project.description,
-        'field': project.field
-    })
+        'field': project.field,
+        'skill_requirements': project.skill_requirements
+    }), 201 # Return 201 Created status
 
 @app.route('/edit_project/<int:project_id>', methods=['GET', 'POST'])
 @login_required
@@ -436,6 +468,14 @@ def edit_project(project_id):
         project.name = request.form['name']
         project.description = request.form['description']
         project.field = request.form['field']
+        project.skill_requirements = request.form.get('skill_requirements', '') # Get and update skill_requirements
+        
+        # Validate required fields again (name, description, field)
+        if not all([project.name, project.description, project.field]):
+            flash('Project Name, Description, and Field are required.')
+            # Pass project object back to template to repopulate form
+            return render_template('edit_project.html', project=project) 
+
         db.session.commit()
         flash('Project updated successfully!')
         return redirect(url_for('teacher_dashboard'))
@@ -502,45 +542,53 @@ def init_db():
             {
                 'name': 'AI图像识别项目',
                 'description': '使用深度学习和计算机视觉技术进行医疗图像分析，包括X光片分析和病变检测。项目将使用PyTorch框架，并开发交互式可视化界面展示分析结果。',
-                'field': '医疗健康'
+                'field': '医疗健康',
+                'skill_requirements': 'Python, PyTorch, Computer Vision, Deep Learning'
             },
             {
                 'name': '智能医疗诊断助手',
                 'description': '基于自然语言处理和机器学习的智能问诊系统，能够理解患者描述并提供初步诊断建议。项目使用BERT模型处理医疗文本数据。',
-                'field': '医疗健康'
+                'field': '医疗健康',
+                'skill_requirements': 'Python, NLP, Machine Learning, BERT'
             },
             {
                 'name': '区块链医疗数据系统',
                 'description': '使用区块链技术构建安全、透明的医疗数据共享平台，确保患者数据的隐私和安全。包含智能合约开发和Web界面实现。',
-                'field': '医疗健康'
+                'field': '医疗健康',
+                'skill_requirements': 'Blockchain, Solidity, Smart Contracts, Web Development'
             },
             {
                 'name': '区块链应用开发',
                 'description': '开发基于以太坊的去中心化应用，实现智能合约的部署和调用。项目包括DApp前端开发和智能合约编写。',
-                'field': '区块链'
+                'field': '区块链',
+                'skill_requirements': 'Ethereum, Solidity, Web3.js, JavaScript, DApp Development'
             },
             {
                 'name': '智能家居控制系统',
                 'description': '基于物联网技术的智能家居控制系统，实现远程控制、自动化场景和语音交互。使用 MQTT 协议和 ESP32 开发板，打造完整的智能家居解决方案。',
-                'field': '物联网'
+                'field': '物联网',
+                'skill_requirements': 'IoT, MQTT, ESP32, C++, Embedded Systems'
             },
             {
                 'name': '网络安全漏洞检测平台',
                 'description': '自动化网络安全漏洞扫描与检测平台，能够对企业内网进行安全评估和风险分析。使用 Python 和开源安全工具，构建完整的安全测试框架。',
-                'field': '网络安全'
+                'field': '网络安全',
+                'skill_requirements': 'Python, Cybersecurity, Network Scanning, Linux'
             },
             {
                 'name': '大数据分析与可视化平台',
                 'description': '企业级大数据处理与分析平台，提供直观的数据可视化界面和预测分析功能。使用 Hadoop 生态系统和 D3.js 可视化库，实现数据的存储、处理和展示。',
-                'field': '大数据'
+                'field': '大数据',
+                'skill_requirements': 'Big Data, Hadoop, Spark, D3.js, Data Visualization, Python'
             }
         ]
         
-        for p in projects:
+        for p_data in projects:  # Renamed loop variable to avoid conflict
             project = Project(
-                name=p['name'],
-                description=p['description'],
-                field=p['field'],
+                name=p_data['name'],
+                description=p_data['description'],
+                field=p_data['field'],
+                skill_requirements=p_data.get('skill_requirements', ''),  # Add skill requirements
                 teacher_id=teacher.id
             )
             db.session.add(project)

@@ -38,6 +38,16 @@
                         </div>
                     </div>
 
+                    <div>
+                        <label for="skill_requirements" class="block text-sm font-medium text-gray-700">Skill Requirements (Optional)</label>
+                        <div class="mt-1">
+                            <textarea name="skill_requirements" id="skill_requirements" rows="3"
+                                class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                placeholder="e.g., Python, JavaScript, Machine Learning (comma-separated)"></textarea>
+                            <p class="mt-1 text-xs text-gray-500">Enter skills separated by commas, or a general description of required skills.</p>
+                        </div>
+                    </div>
+
                     <div class="flex justify-end space-x-4">
                         <a href="{{ url_for('teacher_dashboard') }}"
                             class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
