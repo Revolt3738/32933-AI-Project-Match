@@ -100,7 +100,7 @@ AI Project Match 是一个基于 AI 的智能项目匹配平台，帮助学生�
 flowchart TD
     A[学生端] -->|HTTP请求| B(Flask后端)
     B --> C[SQLite数据库]
-    B --> D[DeepSeek API]
+    B --> D["DeepSeek API"]
     E[教师端] -->|项目管理| B
     C -->|存储| F[用户数据]
     C -->|存储| G[项目数据]
@@ -126,7 +126,8 @@ flowchart TD
 - `POST /api/chat` - AI 对话接口
 - `GET /api/projects` - 获取项目列表
 - `POST /api/projects` - 创建新项目
-- `POST /api/interest/:project_id` - 表达项目兴趣
+- `POST /student_interest/:project_id` - 表达项目兴趣
+- `POST /cancel_interest/:project_id` - 取消项目兴趣
 
 详细的 API 文档请参见 [API.md](docs/API.md)
 
@@ -134,7 +135,7 @@ flowchart TD
 
 本项目采用 MIT 协议开源，详见 [LICENSE](LICENSE) 文件。
 
-## 🔑 演示账号
+## 🔑 测试账号
 
-- 教师账号：teacher@test.com / test123
-- 学生账号：student@test.com / test123
+- 教师账号：teacher@test.com / teacher123
+- 学生账号：student@test.com / student123
