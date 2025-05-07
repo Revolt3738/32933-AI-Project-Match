@@ -2,15 +2,15 @@
 
 {% block content %}
 <div class="flex flex-col items-center justify-center min-h-[70vh]">
-    <h1 class="text-4xl font-bold mb-8">欢迎使用 UTS ProjectMatch</h1>
+    <h1 class="text-4xl font-bold mb-8">Welcome to UTS ProjectMatch</h1>
     <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
         <a href="{{ url_for('login', role='teacher') }}" 
             class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-            教师登录
+            Teacher Login
         </a>
         <a href="{{ url_for('login', role='student') }}" 
             class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
-            学生登录
+            Student Login
         </a>
     </div>
 </div>

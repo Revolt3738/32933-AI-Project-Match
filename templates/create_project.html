@@ -5,47 +5,47 @@
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white shadow overflow-hidden sm:rounded-lg">
             <div class="px-4 py-5 sm:px-6">
-                <h2 class="text-2xl font-bold text-gray-900">创建新项目</h2>
-                <p class="mt-1 text-sm text-gray-500">请填写以下信息创建新的项目。</p>
+                <h2 class="text-2xl font-bold text-gray-900">Create New Project</h2>
+                <p class="mt-1 text-sm text-gray-500">Please fill in the information below to create a new project.</p>
             </div>
             
             <div class="border-t border-gray-200">
                 <form method="POST" class="space-y-6 p-6">
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700">项目名称</label>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Project Name</label>
                         <div class="mt-1">
                             <input type="text" name="name" id="name" required
                                 class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                placeholder="例如：智能医疗诊断系统">
+                                placeholder="e.g., Smart Medical Diagnosis System">
                         </div>
                     </div>
 
                     <div>
-                        <label for="description" class="block text-sm font-medium text-gray-700">项目描述</label>
+                        <label for="description" class="block text-sm font-medium text-gray-700">Project Description</label>
                         <div class="mt-1">
                             <textarea name="description" id="description" rows="4" required
                                 class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                placeholder="请详细描述项目的目标、功能和技术要求"></textarea>
+                                placeholder="Please describe the project's goals, features, and technical requirements in detail."></textarea>
                         </div>
                     </div>
 
                     <div>
-                        <label for="field" class="block text-sm font-medium text-gray-700">项目领域</label>
+                        <label for="field" class="block text-sm font-medium text-gray-700">Project Field</label>
                         <div class="mt-1">
                             <input type="text" name="field" id="field" required
                                 class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                placeholder="例如：人工智能、区块链、物联网等">
+                                placeholder="e.g., Artificial Intelligence, Blockchain, IoT, etc.">
                         </div>
                     </div>
 
                     <div class="flex justify-end space-x-4">
                         <a href="{{ url_for('teacher_dashboard') }}"
                             class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                            取消
+                            Cancel
                         </a>
                         <button type="submit"
                             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                            创建项目
+                            Create Project
                         </button>
                     </div>
                 </form>
