@@ -4,13 +4,13 @@
 <div class="min-h-screen bg-gray-100 py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-right mb-4">
-            <a href="{{ url_for('logout') }}" class="text-blue-600 hover:text-blue-800">登出</a>
+            <a href="{{ url_for('logout') }}" class="text-blue-600 hover:text-blue-800">Logout</a>
         </div>
         
         {% if interests %}
         <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
             <div class="px-4 py-5 sm:px-6">
-                <h2 class="text-xl font-bold text-gray-900">我已选择的项目</h2>
+                <h2 class="text-xl font-bold text-gray-900">My Selected Project</h2>
             </div>
             <div class="border-t border-gray-200">
                 {% for interest in interests %}
@@ -43,8 +43,8 @@
                         <div class="ml-4">
                             <a href="{{ url_for('cancel_interest', project_id=interest.project.id) }}" 
                                class="text-red-600 hover:text-red-800 text-sm font-medium"
-                               onclick="return confirm('确定要取消选择此项目吗？')">
-                                取消选择
+                               onclick="return confirm('Are you sure you want to cancel your selection for this project?')">
+                                Cancel Selection
                             </a>
                         </div>
                     </div>
@@ -54,15 +54,15 @@
         </div>
         {% endif %}
         
-        <!-- AI 对话框 -->
+        <!-- AI Chatbox -->
         <div class="bg-white shadow-sm rounded-lg overflow-hidden flex flex-col h-[calc(100vh-8rem)]">
             <div class="px-4 py-5 sm:px-6 flex justify-between items-center border-b border-gray-200">
-                <h2 class="text-xl font-bold text-gray-900">项目匹配助手</h2>
+                <h2 class="text-xl font-bold text-gray-900">Project Match Assistant</h2>
             </div>
             
             <div class="flex-1 flex flex-col">
                 <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4" data-has-interest="{% if interests %}true{% else %}false{% endif %}">
-                    <!-- 对话内容将在这里动态添加 -->
+                    <!-- Chat content will be dynamically added here. -->
                 </div>
                 
                 <div class="border-t border-gray-200 p-4 bg-white">
@@ -70,10 +70,10 @@
                         <textarea id="requirements"
                             class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                             rows="3"
-                            placeholder="例如：我对人工智能和机器学习感兴趣，希望能找到相关的项目..."></textarea>
+                            placeholder="e.g., I'm interested in Artificial Intelligence and Machine Learning, and I'm looking for related projects..."></textarea>
                         <button onclick="sendMessage()"
                             class="inline-flex items-center px-4 py-2 h-fit border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
-                            发送
+                            Send
                         </button>
                     </div>
                 </div>
@@ -83,7 +83,7 @@
 </div>
 
 <script>
-// 获取用户是否已有兴趣项目的状态
+// Get user's existing interest status
 const chatContainer = document.getElementById('chat-container');
 const hasExistingInterest = chatContainer.dataset.hasInterest === 'true';
 
@@ -149,18 +149,18 @@ function displayProjects(projects) {
     const chatContainer = document.getElementById('chat-container');
     const hasInterest = chatContainer.dataset.hasInterest === 'true';
     
-    // 创建项目卡片的HTML
+    // Create HTML for project cards
     let projectsHtml = '<div class="message ai-message">';
     projectsHtml += '<div class="message-avatar"><div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div></div>';
     projectsHtml += '<div class="message-content">';
     
     if (projects.length === 0) {
-        projectsHtml += '<p>抱歉，没有找到匹配的项目。请尝试其他关键词或领域。</p>';
+        projectsHtml += '<p>Sorry, no matching projects found. Please try other keywords or fields.</p>';
     } else {
-        projectsHtml += '<p>根据您的兴趣，以下是为您推荐的项目（按相关性排序）：</p>';
+        projectsHtml += '<p>Based on your interests, here are the recommended projects for you (sorted by relevance):</p>';
         projectsHtml += '<div class="project-cards mt-4 grid grid-cols-1 gap-4">';
         
-        // 项目已按相关性排序，直接遍历显示
+        // Projects are already sorted by relevance, iterate directly
         projects.forEach(project => {
             projectsHtml += `
                 <div class="project-card border rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition">
@@ -182,8 +182,8 @@ function displayProjects(projects) {
                     </div>
                     <div class="mt-3">
                         ${hasInterest ? 
-                            '<button class="text-gray-400 cursor-not-allowed px-3 py-1 text-sm rounded border border-gray-300" disabled>已选择项目</button>' : 
-                            `<button onclick="expressInterest(${project.id})" class="text-blue-600 hover:text-blue-800 px-3 py-1 text-sm rounded border border-blue-300 hover:border-blue-500">选择此项目</button>`
+                            '<button class="text-gray-400 cursor-not-allowed px-3 py-1 text-sm rounded border border-gray-300" disabled>Project Selected</button>' : 
+                            `<button onclick="expressInterest(${project.id})" class="text-blue-600 hover:text-blue-800 px-3 py-1 text-sm rounded border border-blue-300 hover:border-blue-500">Select This Project</button>`
                         }
                     </div>
                 </div>
@@ -195,13 +195,13 @@ function displayProjects(projects) {
     
     projectsHtml += '</div></div>';
     
-    // 添加到聊天容器
+    // Add to chat container
     chatContainer.innerHTML += projectsHtml;
     
-    // 滚动到底部
+    // Scroll to bottom
     chatContainer.scrollTop = chatContainer.scrollHeight;
     
-    // 隐藏加载动画
+    // Hide loading animation
     hideLoading();
 }
 
@@ -222,15 +222,18 @@ function sendMessage() {
     })
     .then(response => response.json())
     .then(data => {
+        hideLoading(); // Hide loading after getting response
         if (data.error) {
-            addMessage('抱歉，出现了一些问题：' + data.error);
+            addMessage('Sorry, there was an issue: ' + data.error);
         } else {
-            addMessage('根据您的兴趣，我为您找到了以下项目：');
+            // Message from AI before listing projects
+            addMessage('Based on your interests, I found the following projects for you:'); 
             displayProjects(data.projects);
         }
     })
     .catch(error => {
-        addMessage('抱歉，请求失败，请稍后重试。');
+        hideLoading(); // Hide loading on error too
+        addMessage('Sorry, the request failed. Please try again later.');
         console.error('Error:', error);
     });
 }

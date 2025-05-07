@@ -4,14 +4,14 @@
 <div class="min-h-screen bg-gray-100 py-6">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-right mb-4">
-            <a href="{{ url_for('logout') }}" class="text-blue-600 hover:text-blue-800">登出</a>
+            <a href="{{ url_for('logout') }}" class="text-blue-600 hover:text-blue-800">Logout</a>
         </div>
         
         <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
             <div class="px-4 py-5 sm:px-6">
-                <h2 class="text-2xl font-bold">我的项目</h2>
+                <h2 class="text-2xl font-bold">My Projects</h2>
                 <a href="{{ url_for('create_project') }}" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
-                    添加新项目
+                    Add New Project
                 </a>
             </div>
             
@@ -22,12 +22,12 @@
                         <div class="flex-grow">
                             <h3 class="text-lg font-medium text-gray-900">{{ project.name }}</h3>
                             <p class="mt-1 text-sm text-gray-600">{{ project.description }}</p>
-                            <p class="mt-2 text-sm text-gray-500">领域：{{ project.field }}</p>
+                            <p class="mt-2 text-sm text-gray-500">Field: {{ project.field }}</p>
                             
-                            <!-- 感兴趣的学生列表 -->
+                            <!-- Interested Students List -->
                             {% if project.interested_students %}
                             <div class="mt-4">
-                                <h4 class="text-sm font-medium text-gray-700">感兴趣的学生：</h4>
+                                <h4 class="text-sm font-medium text-gray-700">Interested Students:</h4>
                                 <ul class="mt-2 space-y-2">
                                     {% for interest in project.interested_students %}
                                     {% set student = get_user(interest.student_id) %}
@@ -41,13 +41,13 @@
                                 </ul>
                             </div>
                             {% else %}
-                            <p class="mt-4 text-sm text-gray-500">暂无学生表达兴趣</p>
+                            <p class="mt-4 text-sm text-gray-500">No students have expressed interest yet.</p>
                             {% endif %}
                         </div>
                         
                         <div class="ml-4">
                             <a href="{{ url_for('edit_project', project_id=project.id) }}" class="text-blue-600 hover:text-blue-800">
-                                编辑
+                                Edit
                             </a>
                         </div>
                     </div>
@@ -56,7 +56,7 @@
                 
                 {% if not current_user.projects %}
                 <div class="px-4 py-5 sm:p-6">
-                    <p class="text-gray-500">暂无项目，请点击"添加新项目"开始创建。</p>
+                    <p class="text-gray-500">No projects yet. Click "Add New Project" to start creating.</p>
                 </div>
                 {% endif %}
             </div>
@@ -96,11 +96,11 @@ document.getElementById('newProjectForm').addEventListener('submit', async (e) =
         if (response.ok) {
             window.location.reload();
         } else {
-            alert('创建项目失败，请重试');
+            alert('Failed to create project, please try again.');
         }
     } catch (error) {
         console.error('Error:', error);
-        alert('创建项目失败，请重试');
+        alert('Failed to create project, please try again.');
     }
 });
 </script>

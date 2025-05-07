@@ -269,7 +269,7 @@ def login(role):
             # 验证用户角色
             if (role == 'teacher' and not user.is_teacher) or (role == 'student' and user.is_teacher):
                 print(f"角色不匹配 - 用户是否为教师: {user.is_teacher}, 请求角色: {role}")
-                flash('无权以该身份登录')
+                flash('Not authorized to login with this role.')
                 return redirect(url_for('login', role=role))
             
             login_user(user)
@@ -283,7 +283,7 @@ def login(role):
                 return redirect(url_for('student_dashboard'))
         else:
             print(f"密码验证失败或用户不存在")
-            flash('邮箱或密码错误')
+            flash('Incorrect email or password.')
             
     return render_template('login.html', role=role)
 
@@ -291,7 +291,7 @@ def login(role):
 @login_required
 def teacher_dashboard():
     if not current_user.is_teacher:
-        flash('无权访问')
+        flash('Unauthorized access.')
         return redirect(url_for('student_dashboard'))
     projects = Project.query.filter_by(teacher_id=current_user.id).all()
     return render_template('teacher_dashboard.html', projects=projects)
@@ -300,7 +300,7 @@ def teacher_dashboard():
 @login_required
 def student_dashboard():
     if current_user.is_teacher:
-        flash('无权访问')
+        flash('Unauthorized access.')
         return redirect(url_for('teacher_dashboard'))
     
     # 获取学生已选择的项目
@@ -371,7 +371,7 @@ def express_interest():
 @login_required
 def create_project():
     if not current_user.is_teacher:
-        flash('只有教师可以创建项目')
+        flash('Only teachers can create projects.')
         return redirect(url_for('index'))
 
     if request.method == 'GET':
@@ -383,7 +383,7 @@ def create_project():
     field = request.form.get('field')
     
     if not all([name, description, field]):
-        flash('所有字段都是必填的')
+        flash('All fields are required.')
         return redirect(url_for('create_project'))
         
     project = Project(
@@ -395,7 +395,7 @@ def create_project():
     db.session.add(project)
     db.session.commit()
     
-    flash('项目创建成功！')
+    flash('Project created successfully!')
     return redirect(url_for('teacher_dashboard'))
 
 @app.route('/api/projects', methods=['POST'])
@@ -429,7 +429,7 @@ def edit_project(project_id):
         
     project = Project.query.get_or_404(project_id)
     if project.teacher_id != current_user.id:
-        flash('您没有权限编辑这个项目')
+        flash('You do not have permission to edit this project.')
         return redirect(url_for('teacher_dashboard'))
         
     if request.method == 'POST':
@@ -437,7 +437,7 @@ def edit_project(project_id):
         project.description = request.form['description']
         project.field = request.form['field']
         db.session.commit()
-        flash('项目更新成功！')
+        flash('Project updated successfully!')
         return redirect(url_for('teacher_dashboard'))
         
     return render_template('edit_project.html', project=project)
@@ -452,20 +452,20 @@ def student_interest(project_id):
     existing_interest = StudentInterest.query.filter_by(student_id=current_user.id).first()
     if existing_interest:
         if existing_interest.project_id == project_id:
-            return jsonify({'message': '您已经选择了这个项目'}), 400
+            return jsonify({'message': 'You have already selected this project.'}), 400
         else:
-            return jsonify({'message': '您已经选择了其他项目，请先取消之前的选择'}), 400
+            return jsonify({'message': 'You have already selected another project. Please cancel your previous selection first.'}), 400
             
     interest = StudentInterest(student_id=current_user.id, project_id=project_id)
     db.session.add(interest)
     db.session.commit()
-    return jsonify({'message': '已成功表达兴趣！'})
+    return jsonify({'message': 'Interest expressed successfully!'})
 
 @app.route('/cancel_interest/<int:project_id>', methods=['GET', 'POST'])
 @login_required
 def cancel_interest(project_id):
     if current_user.is_teacher:
-        flash('无权操作')
+        flash('Operation not permitted.')
         return redirect(url_for('teacher_dashboard'))
         
     interest = StudentInterest.query.filter_by(
@@ -477,10 +477,10 @@ def cancel_interest(project_id):
     db.session.commit()
     
     if request.method == 'GET':
-        flash('已成功取消选择项目')
+        flash('Project selection cancelled successfully.')
         return redirect(url_for('student_dashboard'))
     
-    return jsonify({'message': '已取消选择'})
+    return jsonify({'message': 'Selection cancelled.'})
 
 def init_db():
     with app.app_context():
