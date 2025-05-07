@@ -1,206 +1,152 @@
-# API 文档
+# API Documentation
 
-## 基础信息
+## Base Information
 
-- 基础URL: `http://localhost:5000`
-- 所有请求都需要包含 `Content-Type: application/json` 头
-- 认证使用 Session Cookie
+*   **Base URL:** Assumed to be `http://localhost:5000` during development.
+*   **Authentication:** Uses Flask-Login session cookies managed by the browser. API calls intended for authenticated users must be made within an active browser session where the user is logged in. There is no separate API token authentication.
+*   **Content-Type:** Requests with a JSON body should use `Content-Type: application/json`.
 
-## 认证接口
+## Endpoints
 
-### 登录
+---
 
-```http
-POST /auth/login
-```
+### 1. AI Chat & Project Matching
 
-请求体：
-```json
-{
-    "email": "user@example.com",
-    "password": "password123"
-}
-```
+#### Send Chat Message & Get Recommendations
 
-响应：
-```json
-{
-    "success": true,
-    "user": {
-        "id": 1,
-        "email": "user@example.com",
-        "role": "student"
+*   **Method:** `POST`
+*   **Path:** `/api/chat`
+*   **Auth Required:** Yes (Student Role)
+*   **Description:** Takes a student's natural language query, analyzes it using the AI to extract fields, keywords, features, and skills, then calls the AI again to rank existing projects based on these requirements. Returns a list of relevant projects.
+*   **Request Body:**
+    ```json
+    {
+        "message": "string" // The student's query (e.g., "I know Python and want an AI project")
     }
-}
-```
-
-### 注销
-
-```http
-POST /auth/logout
-```
-
-响应：
-```json
-{
-    "success": true
-}
-```
-
-## 项目接口
-
-### 获取项目列表
-
-```http
-GET /api/projects
-```
-
-查询参数：
-- `page`: 页码（默认：1）
-- `per_page`: 每页数量（默认：10）
-- `field`: 项目领域过滤
-- `search`: 搜索关键词
-
-响应：
-```json
-{
-    "projects": [
-        {
-            "id": 1,
-            "title": "医疗影像AI分析",
-            "description": "使用深度学习进行医疗影像分析",
-            "field": "医疗健康",
-            "teacher_email": "teacher@example.com",
-            "interested_count": 3
-        }
-    ],
-    "total": 100,
-    "page": 1,
-    "per_page": 10
-}
-```
-
-### 创建项目
-
-```http
-POST /api/projects
-```
-
-请求体：
-```json
-{
-    "title": "医疗影像AI分析",
-    "description": "使用深度学习进行医疗影像分析",
-    "field": "医疗健康"
-}
-```
-
-响应：
-```json
-{
-    "success": true,
-    "project": {
-        "id": 1,
-        "title": "医疗影像AI分析",
-        "description": "使用深度学习进行医疗影像分析",
-        "field": "医疗健康",
-        "teacher_email": "teacher@example.com"
+    ```
+*   **Success Response (200 OK):**
+    ```json
+    {
+        "projects": [
+            {
+                "id": integer,          // Project ID
+                "name": string,         // Project Name
+                "description": string,  // Project Description
+                "field": string,        // Project Field/Domain
+                "skill_requirements": string, // Required skills (comma-separated or description), or ""
+                "teacher_email": string // Email of the supervising teacher
+            }
+            // ... more projects if matched
+        ]
     }
-}
-```
+    ```
+    *Note: If no suitable projects are found based on the AI ranking score threshold (currently >= 3), the `projects` list will be empty.*
+*   **Error Responses:**
+    *   `403 Forbidden`: If the logged-in user is a teacher. Returns `{"error": "Unauthorized"}`.
+    *   `405 Method Not Allowed`: If requested via GET. Returns `{"message": "Only POST method is supported"}`.
 
-## AI 对话接口
+---
 
-### 发送消息
+### 2. Project Management (Teacher Only)
 
-```http
-POST /api/chat
-```
+#### Create New Project via API
 
-请求体：
+*   **Method:** `POST`
+*   **Path:** `/api/projects`
+*   **Auth Required:** Yes (Teacher Role)
+*   **Description:** Allows a logged-in teacher to create a new project. This endpoint seems primarily used by the modal form on the teacher dashboard.
+*   **Request Body:**
+    ```json
+    {
+        "name": "string",           // Required
+        "description": "string",    // Required
+        "field": "string",          // Required
+        "skill_requirements": "string" // Optional, defaults to ""
+    }
+    ```
+*   **Success Response (201 Created):**
+    ```json
+    {
+        "id": integer,
+        "name": string,
+        "description": string,
+        "field": string,
+        "skill_requirements": string // or ""
+    }
+    ```
+*   **Error Responses:**
+    *   `403 Forbidden`: If the logged-in user is not a teacher. Returns `{"error": "Unauthorized"}`.
+    *   `400 Bad Request`: If required fields (`name`, `description`, `field`) are missing. Returns `{"error": "Project Name, Description, and Field are required."}`.
+
+---
+
+### 3. Student Project Interest
+
+#### Express Interest in a Project
+
+*   **Method:** `POST`
+*   **Path:** `/student_interest/<int:project_id>`
+*   **Auth Required:** Yes (Student Role)
+*   **Description:** Allows a logged-in student to select a project by expressing interest. A student can only select one project at a time.
+*   **URL Parameters:**
+    *   `project_id` (integer): The ID of the project the student is interested in.
+*   **Request Body:** None
+*   **Success Response (200 OK):**
+    ```json
+    {
+        "message": "Interest expressed successfully!"
+    }
+    ```
+*   **Error Responses:**
+    *   `403 Forbidden`: If the logged-in user is a teacher. Returns `{"error": "Teachers cannot express interest"}`.
+    *   `400 Bad Request`:
+        *   If the student has already selected this specific project. Returns `{"message": "You have already selected this project."}`.
+        *   If the student has already selected a *different* project. Returns `{"message": "You have already selected another project. Please cancel your previous selection first."}`.
+
+#### Cancel Interest in a Project
+
+*   **Method:** `POST` (Note: The backend route also accepts GET for browser redirects, but the API interaction is likely POST)
+*   **Path:** `/cancel_interest/<int:project_id>`
+*   **Auth Required:** Yes (Student Role)
+*   **Description:** Allows a logged-in student to cancel their previously expressed interest in a project.
+*   **URL Parameters:**
+    *   `project_id` (integer): The ID of the project to cancel interest in.
+*   **Request Body:** None
+*   **Success Response (200 OK):**
+    ```json
+    {
+        "message": "Selection cancelled."
+    }
+    ```
+*   **Error Responses:**
+    *   `403 Forbidden`: If the logged-in user is a teacher (results in a redirect with a flash message, not a JSON error).
+    *   `404 Not Found`: If no interest record exists for the current student and the specified `project_id`.
+
+---
+
+## Error Handling
+
+API endpoints generally return appropriate HTTP status codes to indicate success or failure:
+
+*   **2xx (e.g., 200 OK, 201 Created):** Success
+*   **400 Bad Request:** Client error (e.g., missing required parameters)
+*   **403 Forbidden:** Authentication successful, but user lacks permission for the action.
+*   **404 Not Found:** The requested resource (e.g., project) could not be found.
+*   **405 Method Not Allowed:** The HTTP method used is not supported for the endpoint.
+
+When an error occurs (4xx or 5xx status codes), the response body typically contains a JSON object with an `error` or `message` key providing details about the error. 
+
+*Example Error Response:*
 ```json
 {
-    "message": "我想做关于医疗AI的项目",
-    "session_id": "abc123"
+    "error": "Descriptive error message (e.g., Unauthorized)"
 }
 ```
-
-响应：
+*or*
 ```json
 {
-    "type": "project_matches",
-    "projects": [
-        {
-            "id": 1,
-            "title": "医疗影像AI分析",
-            "description": "使用深度学习进行医疗影像分析",
-            "field": "医疗健康",
-            "matching_score": 0.95,
-            "reasoning": "该项目完全符合您对医疗AI的兴趣"
-        }
-    ]
+    "message": "Descriptive error message (e.g., You have already selected this project.)"
 }
 ```
 
-## 项目选择接口
-
-### 表达兴趣
-
-```http
-POST /api/interest/{project_id}
-```
-
-响应：
-```json
-{
-    "success": true,
-    "message": "已成功表达对项目的兴趣"
-}
-```
-
-### 取消兴趣
-
-```http
-DELETE /api/interest/{project_id}
-```
-
-响应：
-```json
-{
-    "success": true,
-    "message": "已成功取消对项目的兴趣"
-}
-```
-
-## 错误处理
-
-所有接口在发生错误时都会返回相应的 HTTP 状态码和错误信息：
-
-```json
-{
-    "error": true,
-    "message": "错误描述",
-    "code": "ERROR_CODE"
-}
-```
-
-常见状态码：
-- 400: 请求参数错误
-- 401: 未认证
-- 403: 无权限
-- 404: 资源不存在
-- 500: 服务器内部错误
-
-## 速率限制
-
-- 普通接口：60次/分钟
-- AI对话接口：10次/分钟
-
-超过限制将返回 429 状态码：
-```json
-{
-    "error": true,
-    "message": "请求过于频繁，请稍后再试",
-    "code": "RATE_LIMIT_EXCEEDED"
-}
-```
+*Note: The exact structure is not strictly standardized across all error responses. Some non-API related errors or redirects might result in HTML responses with flashed messages instead of JSON.*
