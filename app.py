@@ -291,6 +291,18 @@ def apply_to_project(project_id):
     if project.status != 'approved':
         return jsonify({'error': 'Project not approved'}), 400
 
+    #
+    teacher = User.query.get(project.teacher_id)
+    if teacher and teacher.quota is not None:
+        #
+        current_count = ApprovedProject.query \
+            .join(Project, Project.id == ApprovedProject.project_id) \
+            .filter(Project.teacher_id == teacher.id).count()
+
+        if current_count >= teacher.quota:
+            return jsonify({'error': 'Teacher has reached their supervision quota'}), 400
+
+    #
     existing = ApprovedProject.query.filter_by(student_id=current_user.id, project_id=project_id).first()
     if existing:
         return jsonify({'message': 'Already applied'}), 400
@@ -299,6 +311,7 @@ def apply_to_project(project_id):
     db.session.add(application)
     db.session.commit()
     return jsonify({'message': 'Application successful'})
+
 
 @login_manager.user_loader
 def load_user(user_id):
