@@ -23,7 +23,7 @@ openai.api_key = api_key
 openai.api_base = "https://api.deepseek.com/v1"
 
 # 可用的项目领域
-AVAILABLE_FIELDS = ['医疗健康', '区块链', '人工智能', '物联网', '大数据', '云计算', '网络安全']
+AVAILABLE_FIELDS = ['Medical and Healthy', 'Block Chain', 'AI', 'IOT', 'Big Data', 'Cloud Computing', 'Cyber Security']
 
 def call_deepseek_api(messages):
     """调用DeepSeek API进行对话"""
@@ -73,13 +73,13 @@ def analyze_user_requirements(user_input):
 
 #### 知识储备
 - 项目领域：
-  - 医疗健康
-  - 区块链
-  - 人工智能
-  - 物联网
-  - 大数据
-  - 云计算
-  - 网络安全
+  - Medical and Healthy
+  - Block Chain
+  - AI
+  - IOT
+  - Big Data
+  - Cloud Computing
+  - Cyber Security
 - 常见技能示例 (不限于此列表): Python, JavaScript, Java, C++, SQL, React, Angular, Vue, Node.js, Django, Flask, Spring, Machine Learning, Deep Learning, Data Analysis, AWS, Azure, Docker, Kubernetes, Git
 
 #### 输出格式
@@ -232,15 +232,21 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     is_teacher = db.Column(db.Boolean, default=False)
-    projects = db.relationship('Project', backref='teacher', lazy=True)
+    quota = db.Column(db.Integer, nullable=True, default=None)# number of students that teacher can supervise
+    projects = db.relationship('Project', backref='teacher', lazy=True, foreign_keys='Project.teacher_id')
 
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
     field = db.Column(db.String(50), nullable=False)
-    skill_requirements = db.Column(db.Text, nullable=True)  # New field for skill requirements
-    teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    skill_requirements = db.Column(db.String(200), default='')
+
+    status = db.Column(db.String(20), nullable=False, default='pending')
+    teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # teacher who supervise this project
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # wsho created this project
+
     interested_students = db.relationship('StudentInterest', backref='project', lazy=True)
 
 class StudentInterest(db.Model):
@@ -248,6 +254,51 @@ class StudentInterest(db.Model):
     student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+class ApprovedProject(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+@app.route('/api/project/approve/<int:project_id>', methods=['POST'])
+@login_required
+def approve_project(project_id):
+    if not current_user.is_teacher:
+        return jsonify({'error': 'Unauthorized'}), 403
+    project = Project.query.get_or_404(project_id)
+    project.status = 'approved'
+    db.session.commit()
+    return jsonify({'message': 'Project approved'})
+
+@app.route('/api/project/reject/<int:project_id>', methods=['POST'])
+@login_required
+def reject_project(project_id):
+    if not current_user.is_teacher:
+        return jsonify({'error': 'Unauthorized'}), 403
+    project = Project.query.get_or_404(project_id)
+    project.status = 'rejected'
+    db.session.commit()
+    return jsonify({'message': 'Project rejected'})
+
+@app.route('/api/project/apply/<int:project_id>', methods=['POST'])
+@login_required
+def apply_to_project(project_id):
+    if current_user.is_teacher:
+        return jsonify({'error': 'Teachers cannot apply'}), 403
+
+    project = Project.query.get_or_404(project_id)
+    if project.status != 'approved':
+        return jsonify({'error': 'Project not approved'}), 400
+
+    existing = ApprovedProject.query.filter_by(student_id=current_user.id, project_id=project_id).first()
+    if existing:
+        return jsonify({'message': 'Already applied'}), 400
+
+    application = ApprovedProject(student_id=current_user.id, project_id=project_id)
+    db.session.add(application)
+    db.session.commit()
+    return jsonify({'message': 'Application successful'})
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -258,6 +309,36 @@ def utility_processor():
     def get_user(user_id):
         return User.query.get(user_id)
     return dict(get_user=get_user)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        role = request.form.get('role')  # 'teacher' or 'student'
+
+        if not email or not password or not role:
+            flash('All fields are required.')
+            return redirect(url_for('register'))
+
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            flash('Email already registered.')
+            return redirect(url_for('register'))
+
+        new_user = User(
+            email=email,
+            password_hash=generate_password_hash(password),
+            is_teacher=(role == 'teacher'),
+            quota=3 if role == 'teacher' else None
+        )
+        db.session.add(new_user)
+        db.session.commit()
+
+        flash('Registration successful. Please log in.')
+        return redirect(url_for('default_login'))
+
+    return render_template('register.html')
 
 @app.route('/')
 def index():
@@ -391,41 +472,38 @@ def express_interest():
 @app.route('/create_project', methods=['GET', 'POST'])
 @login_required
 def create_project():
-    if not current_user.is_teacher:
-        flash('Only teachers can create projects.')
-        return redirect(url_for('index'))
-
     if request.method == 'POST':
         name = request.form.get('name')
         description = request.form.get('description')
         field = request.form.get('field')
-        skill_requirements = request.form.get('skill_requirements', '') # Get skill_requirements
-        
-        if not all([name, description, field]): # Skill requirements can be optional
-            flash('Project Name, Description, and Field are required.') # Updated flash message
+        skill_requirements = request.form.get('skill_requirements', '')
+
+        if not all([name, description, field]):
+            flash('Project Name, Description, and Field are required.')
             return redirect(url_for('create_project'))
-            
+
         project = Project(
             name=name,
             description=description,
             field=field,
-            skill_requirements=skill_requirements, # Save skill_requirements
-            teacher_id=current_user.id
+            skill_requirements=skill_requirements,
+            teacher_id=current_user.id if current_user.is_teacher else None,
+            creator_id=current_user.id
         )
         db.session.add(project)
         db.session.commit()
-        
+
         flash('Project created successfully!')
-        return redirect(url_for('teacher_dashboard'))
-        
+        if current_user.is_teacher:
+            return redirect(url_for('teacher_dashboard'))
+        else:
+            return redirect(url_for('student_dashboard'))
+
     return render_template('create_project.html')
 
 @app.route('/api/projects', methods=['POST'])
 @login_required
-def api_create_project(): # This is used by the modal in teacher_dashboard
-    if not current_user.is_teacher:
-        return jsonify({'error': 'Unauthorized'}), 403
-    
+def api_create_project():
     data = request.json
     name = data.get('name')
     description = data.get('description')
@@ -440,18 +518,20 @@ def api_create_project(): # This is used by the modal in teacher_dashboard
         description=description,
         field=field,
         skill_requirements=skill_requirements,
-        teacher_id=current_user.id
+        teacher_id=current_user.id if current_user.is_teacher else None,
+        creator_id=current_user.id
     )
     db.session.add(project)
     db.session.commit()
-    
+
     return jsonify({
         'id': project.id,
         'name': project.name,
         'description': project.description,
         'field': project.field,
-        'skill_requirements': project.skill_requirements
-    }), 201 # Return 201 Created status
+        'skill_requirements': project.skill_requirements,
+        'status': project.status
+    }), 201
 
 @app.route('/edit_project/<int:project_id>', methods=['GET', 'POST'])
 @login_required
@@ -532,7 +612,8 @@ def init_db():
         teacher = User(
             email='teacher@test.com',
             password_hash=generate_password_hash('teacher123'),
-            is_teacher=True
+            is_teacher=True,
+            quota=3
         )
         db.session.add(teacher)
         db.session.commit()  # 立即提交以获取teacher.id
@@ -542,43 +623,43 @@ def init_db():
             {
                 'name': 'AI图像识别项目',
                 'description': '使用深度学习和计算机视觉技术进行医疗图像分析，包括X光片分析和病变检测。项目将使用PyTorch框架，并开发交互式可视化界面展示分析结果。',
-                'field': '医疗健康',
+                'field': 'Medical and Healthy',
                 'skill_requirements': 'Python, PyTorch, Computer Vision, Deep Learning'
             },
             {
                 'name': '智能医疗诊断助手',
                 'description': '基于自然语言处理和机器学习的智能问诊系统，能够理解患者描述并提供初步诊断建议。项目使用BERT模型处理医疗文本数据。',
-                'field': '医疗健康',
+                'field': 'Medical and Healthy',
                 'skill_requirements': 'Python, NLP, Machine Learning, BERT'
             },
             {
                 'name': '区块链医疗数据系统',
                 'description': '使用区块链技术构建安全、透明的医疗数据共享平台，确保患者数据的隐私和安全。包含智能合约开发和Web界面实现。',
-                'field': '医疗健康',
+                'field': 'Medical and Healthy',
                 'skill_requirements': 'Blockchain, Solidity, Smart Contracts, Web Development'
             },
             {
                 'name': '区块链应用开发',
                 'description': '开发基于以太坊的去中心化应用，实现智能合约的部署和调用。项目包括DApp前端开发和智能合约编写。',
-                'field': '区块链',
+                'field': 'Block Chain',
                 'skill_requirements': 'Ethereum, Solidity, Web3.js, JavaScript, DApp Development'
             },
             {
                 'name': '智能家居控制系统',
                 'description': '基于物联网技术的智能家居控制系统，实现远程控制、自动化场景和语音交互。使用 MQTT 协议和 ESP32 开发板，打造完整的智能家居解决方案。',
-                'field': '物联网',
+                'field': 'IOT',
                 'skill_requirements': 'IoT, MQTT, ESP32, C++, Embedded Systems'
             },
             {
                 'name': '网络安全漏洞检测平台',
                 'description': '自动化网络安全漏洞扫描与检测平台，能够对企业内网进行安全评估和风险分析。使用 Python 和开源安全工具，构建完整的安全测试框架。',
-                'field': '网络安全',
+                'field': 'Cyber Security',
                 'skill_requirements': 'Python, Cybersecurity, Network Scanning, Linux'
             },
             {
                 'name': '大数据分析与可视化平台',
                 'description': '企业级大数据处理与分析平台，提供直观的数据可视化界面和预测分析功能。使用 Hadoop 生态系统和 D3.js 可视化库，实现数据的存储、处理和展示。',
-                'field': '大数据',
+                'field': 'Big Data',
                 'skill_requirements': 'Big Data, Hadoop, Spark, D3.js, Data Visualization, Python'
             }
         ]
@@ -588,8 +669,9 @@ def init_db():
                 name=p_data['name'],
                 description=p_data['description'],
                 field=p_data['field'],
-                skill_requirements=p_data.get('skill_requirements', ''),  # Add skill requirements
-                teacher_id=teacher.id
+                skill_requirements=p_data.get('skill_requirements', ''),
+                teacher_id=teacher.id,
+                creator_id=teacher.id
             )
             db.session.add(project)
         
