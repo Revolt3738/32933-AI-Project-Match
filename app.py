@@ -13,7 +13,7 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///instance/test.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # 配置 OpenAI
@@ -634,47 +634,71 @@ def init_db():
         # 添加测试项目
         projects = [
             {
-                'name': 'AI图像识别项目',
-                'description': '使用深度学习和计算机视觉技术进行医疗图像分析，包括X光片分析和病变检测。项目将使用PyTorch框架，并开发交互式可视化界面展示分析结果。',
+                'name': 'AI Image Recognition Project',
+                'description': 'This project utilizes deep learning and computer vision techniques to perform medical image analysis, including X-ray interpretation and lesion detection. It will be developed using the PyTorch framework and feature an interactive visualization interface to present the analysis results.',
                 'field': 'Medical and Healthy',
                 'skill_requirements': 'Python, PyTorch, Computer Vision, Deep Learning'
             },
             {
-                'name': '智能医疗诊断助手',
-                'description': '基于自然语言处理和机器学习的智能问诊系统，能够理解患者描述并提供初步诊断建议。项目使用BERT模型处理医疗文本数据。',
+                'name': 'Intelligent Medical Diagnosis Assistant',
+                'description': 'An intelligent consultation system based on natural language processing and machine learning, capable of understanding patient descriptions and providing preliminary diagnostic suggestions. The project uses the BERT model to process medical text data.',
                 'field': 'Medical and Healthy',
                 'skill_requirements': 'Python, NLP, Machine Learning, BERT'
             },
             {
-                'name': '区块链医疗数据系统',
-                'description': '使用区块链技术构建安全、透明的医疗数据共享平台，确保患者数据的隐私和安全。包含智能合约开发和Web界面实现。',
+                'name': 'Blockchain-Based Medical Data System',
+                'description': 'A secure and transparent medical data sharing platform built using blockchain technology, ensuring patient data privacy and security. The project includes smart contract development and web interface implementation.',
                 'field': 'Medical and Healthy',
                 'skill_requirements': 'Blockchain, Solidity, Smart Contracts, Web Development'
             },
             {
-                'name': '区块链应用开发',
-                'description': '开发基于以太坊的去中心化应用，实现智能合约的部署和调用。项目包括DApp前端开发和智能合约编写。',
+                'name': 'Blockchain Application Development',
+                'description': 'Development of decentralized applications (DApps) based on Ethereum, enabling the deployment and interaction with smart contracts. The project includes DApp frontend development and smart contract programming.',
                 'field': 'Block Chain',
                 'skill_requirements': 'Ethereum, Solidity, Web3.js, JavaScript, DApp Development'
             },
             {
-                'name': '智能家居控制系统',
-                'description': '基于物联网技术的智能家居控制系统，实现远程控制、自动化场景和语音交互。使用 MQTT 协议和 ESP32 开发板，打造完整的智能家居解决方案。',
+                'name': 'Smart Home Control System',
+                'description': 'A smart home control system based on IoT technology, enabling remote control, automated scenarios, and voice interaction. The project utilizes the MQTT protocol and ESP32 development boards to deliver a comprehensive smart home solution.',
                 'field': 'IOT',
                 'skill_requirements': 'IoT, MQTT, ESP32, C++, Embedded Systems'
             },
             {
-                'name': '网络安全漏洞检测平台',
-                'description': '自动化网络安全漏洞扫描与检测平台，能够对企业内网进行安全评估和风险分析。使用 Python 和开源安全工具，构建完整的安全测试框架。',
+                'name': 'Cybersecurity Vulnerability Detection Platform',
+                'description': 'An automated cybersecurity vulnerability scanning and detection platform capable of assessing internal enterprise networks for security risks and vulnerabilities. The project is built using Python and open-source security tools to establish a comprehensive security testing framework.',
                 'field': 'Cyber Security',
                 'skill_requirements': 'Python, Cybersecurity, Network Scanning, Linux'
             },
             {
-                'name': '大数据分析与可视化平台',
-                'description': '企业级大数据处理与分析平台，提供直观的数据可视化界面和预测分析功能。使用 Hadoop 生态系统和 D3.js 可视化库，实现数据的存储、处理和展示。',
+                'name': 'Big Data Analytics and Visualization Platform',
+                'description': 'An enterprise-level big data processing and analytics platform that offers intuitive data visualization and predictive analysis capabilities. The project leverages the Hadoop ecosystem for data storage and processing, and utilizes the D3.js library for dynamic data visualization.',
                 'field': 'Big Data',
                 'skill_requirements': 'Big Data, Hadoop, Spark, D3.js, Data Visualization, Python'
-            }
+            },
+            {
+                'name': 'Decentralized Identity Verification System',
+                'description': 'A blockchain-based identity verification system that enables users to securely control and share their identity credentials without relying on centralized authorities. The system uses smart contracts for credential issuance and verification, ensuring transparency and resistance to tampering.',
+                'field': 'Block chain',
+                'skill_requirements': 'Solidity, Ethereum, Smart Contracts, Web3.js, Cryptography'
+            },
+            {
+                'name': 'Smart Agriculture Monitoring System',
+                'description': 'An IoT-powered system for real-time monitoring of agricultural conditions such as soil moisture, temperature, and humidity. The project involves developing embedded firmware on microcontrollers and a cloud-based dashboard for farmers to receive alerts and optimize irrigation strategies.',
+                'field': 'IoT',
+                'skill_requirements': 'ESP32, MQTT, Sensors Integration, Python, Cloud Platforms'
+            },
+            {
+                'name': 'AI-Driven Intrusion Detection System',
+                'description': 'A machine learning–based intrusion detection system that analyzes network traffic to identify abnormal patterns and potential threats in real time. The system is trained using labeled network datasets and includes a dashboard for security alerts and reports.',
+                'field': 'Cybersecurity',
+                'skill_requirements': 'Python, Scikit-learn, Network Security, Packet Analysis (Wireshark), Flask/Django'
+            },
+            {
+                'name': 'Real-Time Traffic Flow Prediction Using Big Data Analytics',
+                'description': 'A big data platform that collects, processes, and analyzes real-time traffic data to predict congestion and optimize route planning. The system integrates multiple data sources such as GPS, weather, and traffic sensors, and visualizes results on an interactive map.',
+                'field': 'Big Data',
+                'skill_requirements': 'Apache Spark, Kafka, Hadoop, Scala/Python, D3.js or Leaflet.js'
+            },
         ]
         
         for p_data in projects:  # Renamed loop variable to avoid conflict
