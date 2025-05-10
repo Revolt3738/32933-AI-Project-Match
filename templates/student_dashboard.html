@@ -259,12 +259,12 @@ function expressInterest(projectId) {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert(error.message || '操作失败，请稍后重试');
+        alert(error.message || 'Operation failed, please try again later.');
     });
 }
 
 function cancelInterest(projectId) {
-    if (!confirm('确定要取消选择这个项目吗？')) return;
+    if (!confirm('Are you sure you want to cancel your selection for this project?')) return;
     
     fetch(`/cancel_interest/${projectId}`, {
         method: 'POST',
@@ -283,7 +283,7 @@ function cancelInterest(projectId) {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert(error.message || '操作失败，请稍后重试');
+        alert(error.message || 'Operation failed, please try again later.');
     });
 }
 
