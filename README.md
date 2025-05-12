@@ -12,130 +12,130 @@
 
 </div>
 
-AI Project Match 是一个基于 AI 的智能项目匹配平台，帮助学生找到最适合的毕业设计项目，并连接学生与指导教师。
+AI Project Match is an intelligent platform based on AI that helps students find the most suitable graduation design projects and connects students with supervising teachers.
 
-## ✨ 特性
+## ✨ Features
 
-- 🤖 **AI 智能匹配**: 利用 DeepSeek API 进行智能项目推荐
-- 👥 **双角色系统**: 支持教师发布项目和学生选择项目
-- 💬 **智能对话**: 自然语言交互，精准理解学生需求
-- 🎯 **精准推荐**: 基于多维度分析的项目匹配算法
-- 🔄 **实时反馈**: 即时的项目选择和取消功能
+- 🤖 **AI Intelligent Matching**: Using DeepSeek API for smart project recommendations
+- 👥 **Dual-Role System**: Supporting teachers to publish projects and students to select projects
+- 💬 **Intelligent Dialogue**: Natural language interaction, precisely understanding student needs
+- 🎯 **Precise Recommendations**: Project matching algorithm based on multi-dimensional analysis
+- 🔄 **Real-time Feedback**: Instant project selection and cancellation functionality
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 环境要求
+### Requirements
 
 - Git
 - Python 3.8+
-- pip (Python 包管理器)
-- SQLite3 (通常随 Python 一起安装)
-- 现代浏览器（推荐 Chrome）
+- pip (Python package manager)
+- SQLite3 (usually installed with Python)
+- Modern browser (Chrome recommended)
 
-### 安装步骤
+### Installation Steps
 
-1.  **克隆仓库**
+1.  **Clone Repository**
 
     ```bash
     git clone https://github.com/Revolt3738/32933-AI-Project-Match.git
     cd 32933-AI-Project-Match
     ```
 
-2.  **创建并激活虚拟环境** (推荐)
+2.  **Create and Activate Virtual Environment** (recommended)
 
     *   **Windows (PowerShell):**
         ```powershell
         python -m venv venv
         .\venv\Scripts\Activate.ps1
-        # 如果遇到脚本执行策略问题，可能需要先运行: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+        # If you encounter script execution policy issues, you may need to run: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
         ```
     *   **Linux / macOS (bash):**
         ```bash
         python3 -m venv venv
         source venv/bin/activate
         ```
-    *   *激活后，终端提示符前应出现 `(venv)`。*
+    *   *After activation, `(venv)` should appear before the terminal prompt.*
 
-3.  **安装依赖**
+3.  **Install Dependencies**
 
-    *   在激活的虚拟环境中运行：
+    *   In the activated virtual environment, run:
         ```bash
         pip install -r requirements.txt
         ```
 
-4.  **配置环境变量**
+4.  **Configure Environment Variables**
 
-    *   复制示例文件：
+    *   Copy the example file:
         ```bash
         # Windows (cmd/powershell)
         copy .env.example .env
         # Linux / macOS
         cp .env.example .env
         ```
-    *   **编辑 `.env` 文件**，至少填入你的 `DEEPSEEK_API_KEY`：
+    *   **Edit the `.env` file**, at least fill in your `DEEPSEEK_API_KEY`:
         ```dotenv
-        SECRET_KEY='一个随机且安全的字符串'  # 可选，不填会使用默认值
-        DATABASE_URL='sqlite:///instance/test.db' # 可选，默认使用 SQLite
-        DEEPSEEK_API_KEY='你的DeepSeek API密钥' # 必需
+        SECRET_KEY='a random and secure string'  # Optional, a default value will be used if not provided
+        DATABASE_URL='sqlite:///instance/test.db' # Optional, SQLite is used by default
+        DEEPSEEK_API_KEY='your DeepSeek API key' # Required
         ```
 
-5.  **初始化数据库并运行应用**
+5.  **Initialize Database and Run Application**
 
-    *   运行 `app.py` 会自动检查并创建数据库（如果不存在），然后启动开发服务器：
+    *   Running `app.py` will automatically check and create the database (if it doesn't exist), then start the development server:
         ```bash
         python app.py
         ```
-    *   或者，如果只想运行应用而不依赖 `app.py` 中的初始化逻辑（假设数据库已存在或通过其他方式创建）：
+    *   Or, if you only want to run the application without relying on the initialization logic in `app.py` (assuming the database already exists or is created through other means):
         ```bash
         flask run
         ```
 
-6.  **访问应用**
+6.  **Access the Application**
 
-    在浏览器中打开 http://localhost:5000 (或 Flask 输出的其他地址) 开始使用！
+    Open http://localhost:5000 (or another address output by Flask) in your browser to start using it!
 
-## 🔧 系统架构
+## 🔧 System Architecture
 
 ```mermaid
 flowchart TD
-    A[学生端] -->|HTTP请求| B(Flask后端)
-    B --> C[SQLite数据库]
+    A[Student Side] -->|HTTP Requests| B(Flask Backend)
+    B --> C[SQLite Database]
     B --> D["DeepSeek API"]
-    E[教师端] -->|项目管理| B
-    C -->|存储| F[用户数据]
-    C -->|存储| G[项目数据]
-    C -->|存储| H[选择记录]
+    E[Teacher Side] -->|Project Management| B
+    C -->|Store| F[User Data]
+    C -->|Store| G[Project Data]
+    C -->|Store| H[Selection Records]
 ```
 
-## 🎯 核心功能
+## 🎯 Core Functions
 
-### 教师端
-- 创建和管理项目
-- 查看对项目感兴趣的学生
-- 项目信息的编辑和更新
+### Teacher Side
+- Create and manage projects
+- View students interested in projects
+- Edit and update project information
 
-### 学生端
-- AI 驱动的项目推荐
-- 自然语言交互
-- 项目选择和取消
-- 实时查看已选项目状态
+### Student Side
+- AI-driven project recommendations
+- Natural language interaction
+- Project selection and cancellation
+- Real-time viewing of selected project status
 
-## 📝 API 文档
+## 📝 API Documentation
 
-### 主要接口
-- `POST /api/chat` - AI 对话接口
-- `GET /api/projects` - 获取项目列表
-- `POST /api/projects` - 创建新项目
-- `POST /student_interest/:project_id` - 表达项目兴趣
-- `POST /cancel_interest/:project_id` - 取消项目兴趣
+### Main Interfaces
+- `POST /api/chat` - AI conversation interface
+- `GET /api/projects` - Get project list
+- `POST /api/projects` - Create new project
+- `POST /student_interest/:project_id` - Express interest in a project
+- `POST /cancel_interest/:project_id` - Cancel project interest
 
-详细的 API 文档请参见 [API.md](docs/API.md)
+For detailed API documentation, please see [API.md](docs/API.md)
 
-## 📄 开源协议
+## 📄 License
 
-本项目采用 MIT 协议开源，详见 [LICENSE](LICENSE) 文件。
+This project is open-sourced under the MIT License, see the [LICENSE](LICENSE) file for details.
 
-## 🔑 测试账号
+## 🔑 Test Accounts
 
-- 教师账号：teacher@test.com / teacher123
-- 学生账号：student@test.com / student123
+- Teacher account: teacher@test.com / teacher123
+- Student account: student@test.com / student123
