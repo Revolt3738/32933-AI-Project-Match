@@ -65,14 +65,7 @@ AI Project Match is an intelligent platform based on AI that helps students find
 
 4.  **Configure Environment Variables**
 
-    *   Copy the example file:
-        ```bash
-        # Windows (cmd/powershell)
-        copy .env.example .env
-        # Linux / macOS
-        cp .env.example .env
-        ```
-    *   **Edit the `.env` file**, at least fill in your `DEEPSEEK_API_KEY`:
+    *   **Create a `.env` file** in the project root and fill in your `DEEPSEEK_API_KEY`:
         ```dotenv
         SECRET_KEY='a random and secure string'  # Optional, a default value will be used if not provided
         DATABASE_URL='sqlite:///instance/test.db' # Optional, SQLite is used by default
