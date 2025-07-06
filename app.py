@@ -40,7 +40,7 @@ def call_deepseek_api(messages):
         response = client.chat.completions.create(
             model="deepseek-chat",
             messages=messages,
-            temperature=0.3,
+            temperature=1.0,
             max_tokens=1000,
             top_p=0.9,
             frequency_penalty=0.0,
