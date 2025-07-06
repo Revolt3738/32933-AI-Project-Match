@@ -23,8 +23,23 @@ wheels/
 
 # Virtual Environment
 venv/
+venv_*/
 ENV/
+env/
+.venv/
+
+# Environment Variables & Secrets
 .env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+config.ini
+secrets.json
+credentials.json
+api_keys.txt
 
 # Flask
 instance/
@@ -32,35 +47,72 @@ instance/
 *.db
 *.sqlite
 *.sqlite3
+*.db-journal
 
-# IDE
+# IDE & Editors
 .idea/
 .vscode/
 *.swp
 *.swo
 .DS_Store
+*.sublime-project
+*.sublime-workspace
+.atom/
+.brackets.json
 
-# 项目特定
-.env
+# Operating System
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+
+# Project Specific
 *.log
 logs/
 temp/
 uploads/
+downloads/
+backup/
+*.tmp
+*.bak
+*.orig
 
-# 数据库
-instance/test.db
-*.db-journal
-
-# API Keys 和敏感信息
-.env
-.env.local
-.env.*.local
-config.ini
-secrets.json
-credentials.json
-
-# 缓存
+# Testing & Coverage
 .cache/
 .pytest_cache/
 .coverage
 htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Documentation
+docs/_build/
+site/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/

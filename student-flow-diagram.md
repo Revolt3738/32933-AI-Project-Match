@@ -6,13 +6,13 @@ sequenceDiagram
     participant DeepSeekAPI
     participant Database
 
-    Student->>Frontend (JS): 输入需求 (e.g., "我会Python，想做AI项目")
+    Student->>Frontend (JS): Input requirements (e.g., "I know Python and want to do AI projects")
     Frontend (JS)->>Backend (Flask): POST /api/chat {message: "..."}
 
     Backend (Flask)->>DeepSeekAPI: 1st Call: Analyze Requirements
     Note right of Backend (Flask): Prompt: Extract Fields, Keywords, Features, Skills
     DeepSeekAPI-->>Backend (Flask): Parsed Requirements (JSON)
-    Note right of Backend (Flask): e.g., {fields: ["人工智能"], skills: ["Python"]}
+    Note right of Backend (Flask): e.g., {fields: ["Artificial Intelligence"], skills: ["Python"]}
 
     Backend (Flask)->>Database: Query All Projects
     Note right of Backend (Flask): SELECT * FROM project;
@@ -28,5 +28,5 @@ sequenceDiagram
 
     Backend (Flask)->>Frontend (JS): Return Ranked Projects (JSON)
     Note right of Backend (Flask): {'projects': [{id, name, desc, field, skills, teacher_email}, ...]}
-    Frontend (JS)->>Student: 显示推荐项目卡片
+    Frontend (JS)->>Student: Display recommended project cards
 ```
