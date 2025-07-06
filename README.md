@@ -95,27 +95,6 @@ AI Project Match is an intelligent platform based on AI that helps students find
 
     Open http://localhost:5000 (or another address output by Flask) in your browser to start using it!
 
-## 💻 Technology Stack
-
-### Backend
-- **Flask 3.1.1** - Modern Python web framework
-- **SQLAlchemy 2.0.41** - Advanced ORM with enhanced type safety
-- **Flask-SQLAlchemy 3.1.1** - Flask integration for SQLAlchemy
-- **Flask-Login 0.6.3** - User session management
-- **Werkzeug 3.1.3** - WSGI utilities and security
-
-### AI Integration
-- **OpenAI 1.93.0** - Latest OpenAI Python SDK
-- **DeepSeek API** - AI-powered project matching
-
-### Frontend
-- **Jinja2** - Template engine
-- **Bootstrap** - Responsive CSS framework
-- **Vanilla JavaScript** - Client-side interactivity
-
-### Database
-- **SQLite 3** - Lightweight database for development
-- **Python-dotenv 1.0.1** - Environment variable management
 
 ## 🔧 System Architecture
 
