@@ -2,9 +2,9 @@
 
 <div align="center">
 
-![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)
-![Flask Version](https://img.shields.io/badge/flask-2.0+-green.svg)
-![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-1.4+-orange.svg)
+![Python Version](https://img.shields.io/badge/python-3.13+-blue.svg)
+![Flask Version](https://img.shields.io/badge/flask-3.1.1-green.svg)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0.41-orange.svg)
 ![SQLite](https://img.shields.io/badge/SQLite-3-blue.svg)
 ![Jinja2](https://img.shields.io/badge/Jinja2-brightgreen.svg)
 ![DeepSeek API](https://img.shields.io/badge/AI-DeepSeek%20API-9cf.svg)
@@ -27,7 +27,7 @@ AI Project Match is an intelligent platform based on AI that helps students find
 ### Requirements
 
 - Git
-- Python 3.8+
+- Python 3.9+ (3.13+ recommended)
 - pip (Python package manager)
 - SQLite3 (usually installed with Python)
 - Modern browser (Chrome recommended)
@@ -81,18 +81,41 @@ AI Project Match is an intelligent platform based on AI that helps students find
 
 5.  **Initialize Database and Run Application**
 
-    *   Running `app.py` will automatically check and create the database (if it doesn't exist), then start the development server:
+    *   The application will automatically initialize the database on first run. Simply start the development server:
         ```bash
         python app.py
         ```
-    *   Or, if you only want to run the application without relying on the initialization logic in `app.py` (assuming the database already exists or is created through other means):
-        ```bash
-        flask run
-        ```
+    *   The application will:
+        - Create the SQLite database in `instance/test.db`
+        - Set up all required tables
+        - Insert test data (teacher and student accounts, sample projects)
+        - Start the Flask development server on http://127.0.0.1:5000
 
 6.  **Access the Application**
 
     Open http://localhost:5000 (or another address output by Flask) in your browser to start using it!
+
+## 💻 Technology Stack
+
+### Backend
+- **Flask 3.1.1** - Modern Python web framework
+- **SQLAlchemy 2.0.41** - Advanced ORM with enhanced type safety
+- **Flask-SQLAlchemy 3.1.1** - Flask integration for SQLAlchemy
+- **Flask-Login 0.6.3** - User session management
+- **Werkzeug 3.1.3** - WSGI utilities and security
+
+### AI Integration
+- **OpenAI 1.93.0** - Latest OpenAI Python SDK
+- **DeepSeek API** - AI-powered project matching
+
+### Frontend
+- **Jinja2** - Template engine
+- **Bootstrap** - Responsive CSS framework
+- **Vanilla JavaScript** - Client-side interactivity
+
+### Database
+- **SQLite 3** - Lightweight database for development
+- **Python-dotenv 1.0.1** - Environment variable management
 
 ## 🔧 System Architecture
 
